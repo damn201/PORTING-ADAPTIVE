@@ -1,0 +1,5 @@
+# Runtime (dibundel ke dalam exe oleh PyInstaller)
+py-cpuinfo>=9.0
+
+# Build
+pyinstaller>=6.0
