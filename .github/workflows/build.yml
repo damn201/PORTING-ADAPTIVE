@@ -1,0 +1,38 @@
+name: Build Uncharted PC Installer
+
+# Cara pakai: push tag v1.0.0 (atau jalankan manual via Actions tab).
+# PyInstaller hanya bisa membangun untuk OS tempat ia berjalan, jadi
+# build Windows dilakukan di runner windows-latest:
+#   windows-latest -> dist/UnchartedPCInstaller.exe
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependensi build
+        run: pip install -r requirements.txt
+
+      - name: Tes mandiri (tanpa GUI)
+        run: python -m uncharted_installer --self-test
+        env:
+          PYTHONPATH: src
+
+      - name: Build dengan PyInstaller
+        run: pyinstaller build/uncharted_installer.spec --noconfirm --workpath .pyinstaller-tmp --distpath dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UnchartedPCInstaller-Windows
+          path: dist/UnchartedPCInstaller.exe
